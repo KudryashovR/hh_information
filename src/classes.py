@@ -143,4 +143,6 @@ class JobVacancy:
         else:
             salary += " и выше"
 
-        return f"{self.title} ({salary}), {self.url}\nОписание: {self.description[:60]}..."
+        descr = self.description[:60] + '...' if len(self.description) > 60 else self.description
+
+        return f"{self.title} ({salary}), {self.url}\nОписание: {descr}"
