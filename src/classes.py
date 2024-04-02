@@ -61,6 +61,10 @@ class HHVacancyService(VacancyService):
                 salary_min, salary_max = 'Не указано', 'Не указано'
 
             description = v.get('snippet', {}).get('requirement', 'Описание отсутствует')
+
+            if not description:
+                description = 'Описание отсутствует'
+
             vacancies.append({"title": title, "url": url, "salary_min": salary_min, "salary_max": salary_max,
                               "description": description})
 
