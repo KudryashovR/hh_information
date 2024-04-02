@@ -32,3 +32,14 @@ def test_parse_vacancies_missing_fields(service):
                         "salary_max": "Не указано", "description": "Описание отсутствует"}]
 
     assert service._parse_vacancies(input_data) == expected_output
+
+
+def test_parse_vacancies_empty_list(service):
+    """
+    Тестирует обработку пустого списка вакансий.
+    """
+
+    input_data = []
+    expected_output = []
+
+    assert service._parse_vacancies(input_data) == expected_output
