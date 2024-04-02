@@ -1,6 +1,5 @@
 import pytest
 
-
 from src.classes import JobVacancy
 
 
