@@ -1,6 +1,5 @@
 import requests
 
-
 from src.abstract_classes import VacancyService
 
 
@@ -30,7 +29,7 @@ class HHVacancyService(VacancyService):
                  и описание).
         """
 
-        params = {"text": search_query, "area": "113"} # 113 - Регион поиска - Россия
+        params = {"text": search_query, "area": "113"}  # 113 - Регион поиска - Россия
         response = requests.get(self.base_url, params=params)
         response.raise_for_status()
         data = response.json()
