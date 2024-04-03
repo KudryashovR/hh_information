@@ -111,15 +111,19 @@ class JobVacancy:
 
         return salary if salary is not None else 0
 
-    def __eq__(self, other: 'JobVacancy') -> bool:
+    def __eq__(self, other: str) -> bool:
         """
-        Определяет равенство вакансий по минимальной зарплате.
+        Определяет наличие ключевых слов в описании вакансии.
 
-        :param other: Вакансия для сравнения.
-        :return: True, если минимальные зарплаты равны, иначе False.
+        :param other: Ключевые слова.
+        :return: True, если ключевое слово входит в описание, иначе False.
         """
 
-        return self.salary_min == other.salary_min
+        for key in other.split(', '):
+            if key in self.description:
+                return True
+
+        return False
 
     def __lt__(self, other: str) -> bool:
         """
