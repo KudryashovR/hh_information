@@ -175,7 +175,7 @@ class JSONVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: dict) -> None:
+    def add_vacancy(self, vacancy_data: list) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
