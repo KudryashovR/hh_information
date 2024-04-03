@@ -146,9 +146,7 @@ class JobVacancy:
         else:
             salary += " и выше"
 
-        descr = self.description[:60] + '...' if len(self.description) > 60 else self.description
-
-        return f"{self.title} ({salary}), {self.url}\nОписание: {descr}"
+        return f"{self.title} ({salary}), {self.url}\nОписание: {self.description}"
 
 
 class JSONVacancyStorage(VacancyStorage):
