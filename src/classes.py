@@ -1,6 +1,9 @@
+import os
 import requests
 from typing import Union
 import json
+import csv
+import pandas as pd
 
 from src.abstract_classes import VacancyService, VacancyStorage
 
@@ -218,7 +221,30 @@ class JSONVacancyStorage(VacancyStorage):
 
     def _load_data(self) -> list:
         """
-        Загружает данные о вакансиях из JSON-файла.
+        Метод-коннектор для работы с разными форматами файлов.
+
+        Поддерживаемые форматы: json, csv, txt, xlsx.
+
+        :return: Список вакансий, сохраненных в файлах (в формате словарей).
+        """
+
+        _, extension = os.path.splitext(self.filename)
+
+        match extension:
+            case '.json':
+                return self._load_data_json()
+            case '.csv':
+                return self._load_data_csv()
+            case '.txt':
+                return self._load_data_txt()
+            case '.xlsx':
+                return self._load_data_excel()
+            case _:
+                raise ValueError(f"Неподдерживаемый формат файла: {extension}")
+
+    def _load_data_json(self) -> list:
+        """
+        Загружает данные из json файла.
 
         :return: Список вакансий, сохраненных в файлах (в формате словарей).
         """
@@ -226,12 +252,93 @@ class JSONVacancyStorage(VacancyStorage):
         with open(self.filename, 'r', encoding='utf-8') as file:
             return json.load(file)
 
+    def _load_data_csv(self) -> list:
+        """
+        Загружает данные из csv файла.
+
+        :return: Список вакансий, сохраненных в файлах (в формате словарей).
+        """
+
+        with open(self.filename, newline='', encoding='utf-8') as csvfile:
+            return list(csv.DictReader(csvfile))
+
+    def _load_data_txt(self) -> list:
+        """
+        Загружает данные из txt файла.
+
+        :return: Список вакансий, сохраненных в файлах (в формате словарей).
+        """
+
+        with open(self.filename, 'r', encoding='utf-8') as file:
+            return [line.strip() for line in file.readline()]
+
+    def _load_data_excel(self) -> list:
+        """
+        Загружает данные из xlsx файла.
+
+        :return: Список вакансий, сохраненных в файлах (в формате словарей).
+        """
+
+        data_frame = pd.read_excel(self.filename)
+
+        return data_frame.to_dict('records')
+
     def _save_data(self, data: list) -> None:
         """
-        Сохраняет данные о вакансиях в JSON-файл.
+        Метод-коннектор для работы с разными форматами файлов.
+
+        Поддерживаемые форматы: json, csv, txt, xlsx.
+
+        :param data: Список вакансий (в формате словарей) для сохранения.
+        """
+
+        _, extension = os.path.splitext(self.filename)
+
+        match extension:
+            case '.json':
+                self._save_data_json(data)
+            case '.csv':
+                self._save_data_csv(data)
+            case '.txt':
+                self._save_data_txt(data)
+            case '.xlsx':
+                self._save_data_excel(data)
+
+    def _save_data_json(self, data: list) -> None:
+        """
+        Сохраняет данные в json файл.
 
         :param data: Список вакансий (в формате словарей) для сохранения.
         """
 
         with open(self.filename, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
+
+    def _save_data_csv(self, data: list) -> None:
+        """
+        Сохраняет данные в csv файл.
+
+        :param data: Список вакансий (в формате словарей) для сохранения.
+        """
+
+        keys = data[0].keys() if data else []
+
+        with open(self.filename, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=keys)
+            writer.writeheader()
+            writer.writerows(data)
+
+    def _save_data_txt(self, data: list) -> None:
+        """
+        Сохраняет данные в txt файл.
+
+        :param data: Список вакансий (в формате словарей) для сохранения.
+        """
+
+        with open(self.filename, 'w', encoding='utf-8') as file:
+            for vacancy in data:
+                file.write(str(vacancy) + '\n')
+
+    def _save_data_excel(self, data: list) -> None:
+        data_frame = pd.DataFrame(data)
+        data_frame.to_excel(self.filename, index=False)
