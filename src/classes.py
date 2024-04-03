@@ -121,15 +121,17 @@ class JobVacancy:
 
         return self.salary_min == other.salary_min
 
-    def __lt__(self, other: 'JobVacancy') -> bool:
+    def __lt__(self, other: str) -> bool:
         """
-        Определяет, меньше ли минимальная зарплата текущей вакансии, чем у другой.
+        Определяет, входит ли вакансия в заданный диапазон цен.
 
-        :param other: Вакансия для сравнения.
+        :param other: Заданный диапазон цен.
         :return: True, если минимальная зарплата текущей вакансии меньше, иначе False.
         """
 
-        return self.salary_min < other.salary_min
+        min_salary, max_salary = other.split(' - ')
+
+        return min_salary <= self.salary_min <= max_salary
 
     def __repr__(self) -> str:
         """
