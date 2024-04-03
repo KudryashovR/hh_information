@@ -184,6 +184,8 @@ class JSONVacancyStorage(VacancyStorage):
             data = self._load_data()
         except FileNotFoundError:
             data = []
+        except json.decoder.JSONDecodeError:
+            data = []
 
         data.append(vacancy_data)
         self._save_data(data)
