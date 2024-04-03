@@ -111,7 +111,7 @@ class JobVacancy:
 
         return salary if salary is not None else 0
 
-    def __eq__(self, other: str) -> bool:
+    def __eq__(self, other: list) -> bool:
         """
         Определяет наличие ключевых слов в описании вакансии.
 
@@ -119,23 +119,59 @@ class JobVacancy:
         :return: True, если ключевое слово входит в описание, иначе False.
         """
 
-        for key in other.split(', '):
+        for key in other:
             if key in self.description:
                 return True
 
         return False
 
-    def __lt__(self, other: str) -> bool:
+    def __lt__(self, other: 'JobVacancy') -> bool:
+        """
+        Определяет, меньше ли минимальная зарплата текущей вакансии, чем у другой.
+
+        :param other: Вакансия для сравнения.
+        :return: True, если минимальная зарплата текущей вакансии меньше, иначе False.
+        """
+
+        return self.salary_min < other.salary_min
+
+    def __le__(self, other: str) -> bool:
+        """
+        Определяет, меньше или равна ли максимальная зарплата текущей вакансии, чем у другой.
+
+        :param other: Цена для сравнения.
+        :return: True, если максимальная зарплата текущей вакансии меньше или равна, иначе False.
+        """
+
+        if self.salary_max is not int:
+            return True
+
+        return self.salary_max <= int(other)
+
+    def __ge__(self, other: str) -> bool:
+        """
+        Определяет, больше или равна ли минимальная зарплата текущей вакансии, чем у другой.
+
+        :param other: Цена для сравнения.
+        :return: True, если минимальная зарплата текущей вакансии больше или равна, иначе False.
+        """
+
+        if self.salary_min is not int:
+            return True
+
+        return self.salary_min >= int(other)
+
+    def comparison_salary(self, other: str) -> bool:
         """
         Определяет, входит ли вакансия в заданный диапазон цен.
 
         :param other: Заданный диапазон цен.
-        :return: True, если минимальная зарплата текущей вакансии меньше, иначе False.
+        :return: True, если зарплата текущей вакансии в заданном диапазоне, иначе False.
         """
 
         min_salary, max_salary = other.split(' - ')
 
-        return min_salary <= self.salary_min <= max_salary
+        return min_salary <= self <= max_salary
 
     def __repr__(self) -> str:
         """
