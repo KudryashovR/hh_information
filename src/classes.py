@@ -28,12 +28,16 @@ class HHVacancyService(VacancyService):
         """
         Выполняет запрос к API hh.ru для получения вакансий по заданному поисковому запросу.
 
+        Константные значения:
+            - area: 113 - Регион поиска - Россия
+            - per_page: - Количество возвращаемых вакансий
+
         :param search_query: текст поискового запроса, по которому необходимо найти вакансии.
         :return: список словарей, каждый из которых содержит информацию о вакансии (название, URL, информация о зарплате
                  и описание).
         """
 
-        params = {"text": search_query, "area": "113"}  # 113 - Регион поиска - Россия
+        params = {"text": search_query, "area": "113", "per_page": 100}
         response = requests.get(self.base_url, params=params)
         response.raise_for_status()
         data = response.json()
@@ -306,7 +310,7 @@ class CSVVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: dict) -> None:
+    def add_vacancy(self, vacancy_data: list) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
