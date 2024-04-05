@@ -12,7 +12,8 @@ def main():
     vacancies = hh_api.fetch_vacancies(search_query)
     vacancies_obj_list = utils.initialize_job_vacancy(vacancies)
     filtered_vacancies = utils.filter_vacancies(vacancies_obj_list, filter_words, salary_range)
-    utils.print_vacancies(utils.get_top_vacancies(sorted(filtered_vacancies), top_count))
+    sorted_vacancies = sorted(filtered_vacancies, reverse=True)
+    utils.print_vacancies(sorted_vacancies[:top_count])
 
 
 if __name__ == '__main__':
