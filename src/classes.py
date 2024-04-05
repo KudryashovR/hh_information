@@ -3,6 +3,7 @@ from typing import Union
 import json
 import csv
 import pandas as pd
+import math
 
 from src.abstract_classes import VacancyService, VacancyStorage
 
@@ -133,8 +134,8 @@ class JobVacancy:
         :return: True, если минимальная зарплата текущей вакансии меньше, иначе False.
         """
 
-        self_salary_min = self.salary_min if type(self.salary_min) is int else 0
-        other_salary_min = other.salary_min if type(other.salary_min) is int else 0
+        self_salary_min = self.salary_min if type(self.salary_min) is int else math.inf
+        other_salary_min = other.salary_min if type(other.salary_min) is int else math.inf
 
         return self_salary_min < other_salary_min
 
