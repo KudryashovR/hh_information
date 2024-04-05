@@ -1,4 +1,3 @@
-import os
 import requests
 from typing import Union
 import json
@@ -29,12 +28,16 @@ class HHVacancyService(VacancyService):
         """
         Выполняет запрос к API hh.ru для получения вакансий по заданному поисковому запросу.
 
+        Константные значения:
+            - area: 113 - Регион поиска - Россия
+            - per_page: - Количество возвращаемых вакансий
+
         :param search_query: текст поискового запроса, по которому необходимо найти вакансии.
         :return: список словарей, каждый из которых содержит информацию о вакансии (название, URL, информация о зарплате
                  и описание).
         """
 
-        params = {"text": search_query, "area": "113"}  # 113 - Регион поиска - Россия
+        params = {"text": search_query, "area": "113", "per_page": 100}
         response = requests.get(self.base_url, params=params)
         response.raise_for_status()
         data = response.json()
@@ -112,15 +115,19 @@ class JobVacancy:
 
         return salary if salary is not None else 0
 
-    def __eq__(self, other: 'JobVacancy') -> bool:
+    def __eq__(self, other: list) -> bool:
         """
-        Определяет равенство вакансий по минимальной зарплате.
+        Определяет наличие ключевых слов в описании вакансии.
 
-        :param other: Вакансия для сравнения.
-        :return: True, если минимальные зарплаты равны, иначе False.
+        :param other: Ключевые слова.
+        :return: True, если ключевое слово входит в описание, иначе False.
         """
 
-        return self.salary_min == other.salary_min
+        for key in other:
+            if key in self.description:
+                return True
+
+        return False
 
     def __lt__(self, other: 'JobVacancy') -> bool:
         """
@@ -130,7 +137,48 @@ class JobVacancy:
         :return: True, если минимальная зарплата текущей вакансии меньше, иначе False.
         """
 
-        return self.salary_min < other.salary_min
+        self_salary_min = self.salary_min if type(self.salary_min) is int else 0
+        other_salary_min = other.salary_min if type(other.salary_min) is int else 0
+
+        return self_salary_min < other_salary_min
+
+    def __le__(self, other: str) -> bool:
+        """
+        Определяет, меньше или равна ли максимальная зарплата текущей вакансии, чем у другой.
+
+        :param other: Цена для сравнения.
+        :return: True, если максимальная зарплата текущей вакансии меньше или равна, иначе False.
+        """
+
+        if self.salary_max is not int:
+            return True
+
+        return self.salary_max <= int(other)
+
+    def __ge__(self, other: str) -> bool:
+        """
+        Определяет, больше или равна ли минимальная зарплата текущей вакансии, чем у другой.
+
+        :param other: Цена для сравнения.
+        :return: True, если минимальная зарплата текущей вакансии больше или равна, иначе False.
+        """
+
+        if self.salary_min is not int:
+            return True
+
+        return self.salary_min >= int(other)
+
+    def comparison_salary(self, other: str) -> bool:
+        """
+        Определяет, входит ли вакансия в заданный диапазон цен.
+
+        :param other: Заданный диапазон цен.
+        :return: True, если зарплата текущей вакансии в заданном диапазоне, иначе False.
+        """
+
+        min_salary, max_salary = other.split(' - ')
+
+        return min_salary <= self <= max_salary
 
     def __repr__(self) -> str:
         """
@@ -147,9 +195,7 @@ class JobVacancy:
         else:
             salary += " и выше"
 
-        descr = self.description[:60] + '...' if len(self.description) > 60 else self.description
-
-        return f"{self.title} ({salary}), {self.url}\nОписание: {descr}"
+        return f"{self.title} ({salary}), {self.url}\nОписание: {self.description}"
 
 
 class JSONVacancyStorage(VacancyStorage):
@@ -229,7 +275,7 @@ class JSONVacancyStorage(VacancyStorage):
         with open(self.filename, 'r', encoding='utf-8') as file:
             return json.load(file)
 
-    def _save_data(self, data: list) -> None:
+    def _save_data(self, data: dict) -> None:
         """
         Сохраняет данные в json файл.
 
@@ -356,11 +402,11 @@ class TXTVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: dict) -> None:
+    def add_vacancy(self, vacancy_data: list) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
-        :param vacancy_data: Словарь с данными о вакансии для добавления.
+        :param vacancy_data: Список с данными о вакансии для добавления.
         """
 
         try:
@@ -445,11 +491,11 @@ class XLSXVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: dict) -> None:
+    def add_vacancy(self, vacancy_data: list) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
-        :param vacancy_data: Словарь с данными о вакансии для добавления.
+        :param vacancy_data: Список с данными о вакансии для добавления.
         """
 
         try:
