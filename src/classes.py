@@ -133,7 +133,10 @@ class JobVacancy:
         :return: True, если минимальная зарплата текущей вакансии меньше, иначе False.
         """
 
-        return self.salary_min < other.salary_min
+        self_salary_min = self.salary_min if type(self.salary_min) is int else 0
+        other_salary_min = other.salary_min if type(other.salary_min) is int else 0
+
+        return self_salary_min < other_salary_min
 
     def __le__(self, other: str) -> bool:
         """
