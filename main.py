@@ -1,19 +1,20 @@
-from src.classes import HHVacancyService, JobVacancy
 import src.utils as utils
 
 
 def main():
-    search_query = input("Введите поисковый запрос: ")
-    top_count = int(input("Введите количество вакансий для вывода в топ N: "))
-    filter_words = input("Введите ключевые слова для фильтрации вакансий (через пробел): ").split()
-    salary_range = input("Введите диапазон зарплат (например: 100000 - 150000): ")
+    founded_vacancies = utils.get_vacancies()
 
-    hh_api = HHVacancyService()
-    vacancies = hh_api.fetch_vacancies(search_query)
-    vacancies_obj_list = utils.initialize_job_vacancy(vacancies)
-    filtered_vacancies = utils.filter_vacancies(vacancies_obj_list, filter_words, salary_range)
-    sorted_vacancies = sorted(filtered_vacancies, reverse=True)
-    utils.print_vacancies(sorted_vacancies[:top_count])
+    user_answer = input("Выберите формат файла для сохранения:\n"
+                        "1. JSON\n"
+                        "2. CSV\n"
+                        "3. TXT\n"
+                        "4. Excel\n")
+
+    match user_answer:
+        case '1' | '2' | '3' | '4':
+            utils.save_vacancies(founded_vacancies, user_answer)
+        case _:
+            print("Диапазон ввода [1-4]")
 
 
 if __name__ == '__main__':

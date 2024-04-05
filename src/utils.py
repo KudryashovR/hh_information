@@ -1,7 +1,81 @@
 import re
+import os
 
 
-from src.classes import JobVacancy
+from src.classes import (JobVacancy, HHVacancyService, JSONVacancyStorage, CSVVacancyStorage, TXTVacancyStorage,
+                         XLSXVacancyStorage)
+
+
+def save_vacancies(vacancies: list, mode: str) -> None:
+    """
+    Сохраняет список вакансий в различные форматы файлов на основе выбранного режима.
+
+    Функция запрашивает у пользователя имя файла для сохранения вакансий. В зависимости от выбранного режима ('mode'),
+    вакансии сохраняются в формате JSON, CSV, TXT или XLSX. Для каждого формата используется соответствующий класс
+    хранилища: JSONVacancyStorage, CSVVacancyStorage, TXTVacancyStorage, XLSXVacancyStorage. Путь к файлу формируется
+    с использованием базовой директории 'data'.
+
+    :param vacancies: список вакансий для сохранения. Каждый элемент списка является структурой данных, описывающей
+                      вакансию.
+    :param mode: строка, определяющая в какой формат файлов сохранять вакансии. Допустимые значения:
+                 '1' - для сохранения в JSON,
+                 '2' - для сохранения в CSV,
+                 '3' - для сохранения в TXT,
+                 '4' - для сохранения в XLSX.
+    """
+
+    user_answer = input("Введите имя файла: ")
+
+    match int(mode):
+        case 1:
+            filename = os.path.join("data", user_answer + ".json")
+            json_storage = JSONVacancyStorage(filename)
+
+            for item in vacancies:
+                json_storage.add_vacancy(item)
+        case 2:
+            filename = os.path.join("data", user_answer + ".csv")
+            csv_storage = CSVVacancyStorage(filename)
+
+            for item in vacancies:
+                csv_storage.add_vacancy(item)
+        case 3:
+            filename = os.path.join("data", user_answer + ".txt")
+            txt_storage = TXTVacancyStorage(filename)
+            txt_storage.add_vacancy(vacancies)
+        case 4:
+            filename = os.path.join("data", user_answer + ".xlsx")
+            xlsx_storage = XLSXVacancyStorage(filename)
+
+            for item in vacancies:
+                xlsx_storage.add_vacancy(item)
+
+
+def get_vacancies() -> list:
+    """
+    Запускает процесс поиска, фильтрации и вывода на экран вакансий с использованием входных данных пользователя.
+
+    Функция запрашивает у пользователя поисковой запрос, количество вакансий для отображения в топе, ключевые слова
+    для фильтрации вакансий и диапазон зарплаты. Далее осуществляется поиск вакансий по заданным параметрам через API
+    HeadHunter (HH), производится их фильтрация и сортировка. В конечном итоге на экран выводится заданное количество
+    топовых вакансий, удовлетворяющих всем заданным критериям.
+
+    :return: Полный список вакансий по критериям.
+    """
+
+    search_query = input("Введите поисковый запрос: ")
+    top_count = int(input("Введите количество вакансий для вывода в топ N: "))
+    filter_words = input("Введите ключевые слова для фильтрации вакансий (через пробел): ").split()
+    salary_range = input("Введите диапазон зарплат (например: 100000 - 150000): ")
+
+    hh_api = HHVacancyService()
+    vacancies = hh_api.fetch_vacancies(search_query)
+    vacancies_obj_list = initialize_job_vacancy(vacancies)
+    filtered_vacancies = filter_vacancies(vacancies_obj_list, filter_words, salary_range)
+    sorted_vacancies = sorted(filtered_vacancies, reverse=True)
+    print_vacancies(sorted_vacancies[:top_count])
+
+    return vacancies
 
 
 def remove_html_tags(text: str) -> str:

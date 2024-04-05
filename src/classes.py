@@ -222,7 +222,7 @@ class JSONVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: list) -> None:
+    def add_vacancy(self, vacancy_data: dict) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
@@ -275,7 +275,7 @@ class JSONVacancyStorage(VacancyStorage):
         with open(self.filename, 'r', encoding='utf-8') as file:
             return json.load(file)
 
-    def _save_data(self, data: list) -> None:
+    def _save_data(self, data: dict) -> None:
         """
         Сохраняет данные в json файл.
 
@@ -310,7 +310,7 @@ class CSVVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: list) -> None:
+    def add_vacancy(self, vacancy_data: dict) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
@@ -402,11 +402,11 @@ class TXTVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: dict) -> None:
+    def add_vacancy(self, vacancy_data: list) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
-        :param vacancy_data: Словарь с данными о вакансии для добавления.
+        :param vacancy_data: Список с данными о вакансии для добавления.
         """
 
         try:
@@ -491,11 +491,11 @@ class XLSXVacancyStorage(VacancyStorage):
 
         self.filename = filename
 
-    def add_vacancy(self, vacancy_data: dict) -> None:
+    def add_vacancy(self, vacancy_data: list) -> None:
         """
         Добавляет новую вакансию в хранилище.
 
-        :param vacancy_data: Словарь с данными о вакансии для добавления.
+        :param vacancy_data: Список с данными о вакансии для добавления.
         """
 
         try:
