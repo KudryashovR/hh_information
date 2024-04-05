@@ -31,27 +31,26 @@ def test_validate_salary_with_none():
     assert vacancy.salary_max == 0
 
 
-def test_vacancies_equality():
+def test_job_vacancy_eq_with_keywords_in_description():
     """
-    Тест проверяет правильность работы метода __eq__. Две вакансии считаются равными, если их минимальные зарплаты
-    равны.
-    """
-
-    vacancy1 = JobVacancy("Python Developer", "http://example1.com", 100000, 150000)
-    vacancy2 = JobVacancy("Frontend Developer", "http://example2.com", 100000, 120000)
-
-    assert vacancy1 == vacancy2
-
-
-def test_vacancies_inequality():
-    """
-    Тест проверяет, что объекты вакансий с разными минимальными зарплатами не равны.
+    Проверяем, что метод __eq__ возвращает True, когда ключевые слова присутствуют в описании
     """
 
-    vacancy1 = JobVacancy("Python Developer", "http://example1.com", 100000, 150000)
-    vacancy2 = JobVacancy("Frontend Developer", "http://example2.com", 90000, 120000)
+    vacancy = JobVacancy("Python Developer", "http://example.com", 50000, 70000,
+                         "We are looking for a Python Developer with experience in Django and Flask.")
 
-    assert vacancy1 != vacancy2
+    assert vacancy.__eq__(['Python', 'Django'])
+
+
+def test_job_vacancy_eq_with_keywords_not_in_description():
+    """
+    Проверяем, что метод __eq__ возвращает False, когда ключевых слов нет в описании
+    """
+
+    vacancy = JobVacancy("Java Developer", "http://example.com", 60000, 80000,
+                         "We are looking for a Java Developer experienced in Spring Framework.")
+
+    assert not vacancy.__eq__(['Python'])
 
 
 def test_vacancies_less_than():

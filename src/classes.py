@@ -275,7 +275,7 @@ class JSONVacancyStorage(VacancyStorage):
         with open(self.filename, 'r', encoding='utf-8') as file:
             return json.load(file)
 
-    def _save_data(self, data: dict) -> None:
+    def _save_data(self, data: list) -> None:
         """
         Сохраняет данные в json файл.
 
